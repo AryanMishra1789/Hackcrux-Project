@@ -17,8 +17,6 @@
             background: rgba(59, 130, 246, 0.9);
             border-radius: 50%;
             position: fixed;
-            bottom: 20px;
-            right: 20px;
             cursor: move;
             display: flex;
             align-items: center;
@@ -104,49 +102,36 @@
         const appStatus = document.getElementById('appStatus');
 
         let isDragging = false;
-        let currentX;
-        let currentY;
-        let initialX;
-        let initialY;
-        let xOffset = 0;
-        let yOffset = 0;
+        let startX;
+        let startY;
+        let windowX;
+        let windowY;
 
         // Handle dragging
-        assistantButton.addEventListener('mousedown', dragStart);
-        document.addEventListener('mousemove', drag);
-        document.addEventListener('mouseup', dragEnd);
+        assistantButton.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.screenX;
+            startY = e.screenY;
+            windowX = window.screenX;
+            windowY = window.screenY;
+        });
 
-        function dragStart(e) {
-            initialX = e.clientX - xOffset;
-            initialY = e.clientY - yOffset;
-
-            if (e.target === assistantButton) {
-                isDragging = true;
-            }
-        }
-
-        function drag(e) {
+        document.addEventListener('mousemove', (e) => {
             if (isDragging) {
                 e.preventDefault();
-                currentX = e.clientX - initialX;
-                currentY = e.clientY - initialY;
-
-                xOffset = currentX;
-                yOffset = currentY;
-
-                setTranslate(currentX, currentY, assistantButton);
+                const deltaX = e.screenX - startX;
+                const deltaY = e.screenY - startY;
+                
+                ipcRenderer.send('move-floating-window', {
+                    x: windowX + deltaX,
+                    y: windowY + deltaY
+                });
             }
-        }
+        });
 
-        function setTranslate(xPos, yPos, el) {
-            el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
-        }
-
-        function dragEnd() {
-            initialX = currentX;
-            initialY = currentY;
+        document.addEventListener('mouseup', () => {
             isDragging = false;
-        }
+        });
 
         // Handle click to open main app
         assistantButton.addEventListener('click', () => {
@@ -168,6 +153,12 @@
             hideTimeout = setTimeout(() => {
                 appInfo.classList.remove('show');
             }, 3000);
+        });
+
+        // Cleanup on window close
+        window.addEventListener('beforeunload', () => {
+            clearTimeout(hideTimeout);
+            ipcRenderer.removeAllListeners('active-app-update');
         });
     </script>
 </body>
