@@ -60,6 +60,12 @@ function createLoginWindow() {
 }
 
 function createFloatingWindow() {
+    // If floating window already exists, just show it
+    if (floatingWindow) {
+        floatingWindow.show();
+        return;
+    }
+
     floatingWindow = new BrowserWindow({
         width: 100,
         height: 100,
@@ -74,6 +80,19 @@ function createFloatingWindow() {
     });
 
     floatingWindow.loadFile('floating-assistant.html');
+    
+    // Position the window initially at the bottom right
+    const { screen } = require('electron');
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width, height } = primaryDisplay.workAreaSize;
+    floatingWindow.setPosition(width - 120, height - 120);
+
+    // Handle window close
+    floatingWindow.on('close', (event) => {
+        event.preventDefault();
+        floatingWindow.hide();
+        return false;
+    });
 }
 
 function createMainWindow() {
@@ -128,6 +147,9 @@ app.on('before-quit', () => {
     app.isQuiting = true;
     if (backendProcess) {
         backendProcess.kill();
+    }
+    if (floatingWindow) {
+        floatingWindow.destroy();
     }
 });
 
@@ -418,4 +440,11 @@ ipcMain.handle('load-settings', () => {
 ipcMain.handle('save-settings', (event, settings) => {
     saveSettings(settings);
     return { status: 'success' };
+});
+
+// Add this with other IPC handlers
+ipcMain.on('move-floating-window', (event, { x, y }) => {
+    if (floatingWindow) {
+        floatingWindow.setPosition(x, y);
+    }
 }); 
