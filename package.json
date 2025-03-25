@@ -1,0 +1,33 @@
+{
+  "name": "email-assistant-ui",
+  "version": "1.0.0",
+  "description": "Email Assistant UI with Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --debug",
+    "build": "electron-builder"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "axios": "^1.6.7",
+    "ps-node": "^0.1.6"
+  },
+  "build": {
+    "appId": "com.emailassistant.app",
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}

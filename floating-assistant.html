@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Floating Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: transparent;
+        }
+        .floating-assistant {
+            width: 60px;
+            height: 60px;
+            background: rgba(59, 130, 246, 0.9);
+            border-radius: 50%;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-app-region: no-drag;
+        }
+        .floating-assistant:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+        .floating-assistant:active {
+            transform: scale(0.95);
+        }
+        .floating-assistant i {
+            color: white;
+            font-size: 24px;
+        }
+        .app-info {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 12px;
+            padding: 1rem;
+            color: white;
+            font-size: 14px;
+            max-width: 300px;
+            display: none;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .app-info.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .app-icon {
+            width: 32px;
+            height: 32px;
+            margin-right: 8px;
+        }
+        .app-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .app-status {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-assistant" id="assistantButton">
+        <i class="fas fa-robot"></i>
+    </div>
+    <div class="app-info" id="appInfo">
+        <div class="flex items-center">
+            <img src="" alt="App Icon" class="app-icon" id="appIcon">
+            <div>
+                <div class="app-name" id="appName"></div>
+                <div class="app-status" id="appStatus"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        const assistantButton = document.getElementById('assistantButton');
+        const appInfo = document.getElementById('appInfo');
+        const appIcon = document.getElementById('appIcon');
+        const appName = document.getElementById('appName');
+        const appStatus = document.getElementById('appStatus');
+
+        let isDragging = false;
+        let currentX;
+        let currentY;
+        let initialX;
+        let initialY;
+        let xOffset = 0;
+        let yOffset = 0;
+
+        // Handle dragging
+        assistantButton.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+
+        function dragStart(e) {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+
+            if (e.target === assistantButton) {
+                isDragging = true;
+            }
+        }
+
+        function drag(e) {
+            if (isDragging) {
+                e.preventDefault();
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+
+                xOffset = currentX;
+                yOffset = currentY;
+
+                setTranslate(currentX, currentY, assistantButton);
+            }
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+        }
+
+        function dragEnd() {
+            initialX = currentX;
+            initialY = currentY;
+            isDragging = false;
+        }
+
+        // Handle click to open main app
+        assistantButton.addEventListener('click', () => {
+            ipcRenderer.send('open-main-app');
+        });
+
+        // Listen for active app updates
+        ipcRenderer.on('active-app-update', (event, data) => {
+            appIcon.src = data.icon;
+            appName.textContent = data.name;
+            appStatus.textContent = data.status;
+            appInfo.classList.add('show');
+        });
+
+        // Hide app info after 3 seconds
+        let hideTimeout;
+        ipcRenderer.on('active-app-update', () => {
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(() => {
+                appInfo.classList.remove('show');
+            }, 3000);
+        });
+    </script>
+</body>
+</html> 

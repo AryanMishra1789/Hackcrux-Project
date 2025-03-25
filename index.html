@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Email Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0f172a;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #ffffff;
+        }
+        .window-titlebar {
+            -webkit-app-region: drag;
+            background: #1e293b;
+            color: #ffffff;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+        .window-controls {
+            -webkit-app-region: no-drag;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .window-control-button {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .minimize-button {
+            background-color: #1e293b;
+            color: #ffffff;
+        }
+        .close-button {
+            background-color: #1e293b;
+            color: #ffffff;
+        }
+        .window-control-button:hover {
+            background-color: #334155;
+        }
+        .close-button:hover {
+            background-color: #ef4444;
+        }
+        .input-field {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 1rem;
+            color: #ffffff;
+            transition: all 0.2s ease;
+            -webkit-app-region: no-drag;
+            width: 100%;
+            font-size: 0.95rem;
+        }
+        .input-field:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        .input-field::placeholder {
+            color: #64748b;
+        }
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            -webkit-app-region: no-drag;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        .btn-primary:disabled {
+            background: #1e293b;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            transition: all 0.2s ease;
+            padding: 1.5rem;
+        }
+        .loading-spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #334155;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        .error-message {
+            display: none;
+            color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 3px solid #ef4444;
+        }
+        .email-container {
+            background: #1e293b;
+            border-radius: 8px;
+            padding: 1.25rem;
+            color: #ffffff;
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-top: 1rem;
+            border: 1px solid #334155;
+        }
+        .voice-button {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 1rem;
+            color: #3b82f6;
+        }
+        .voice-button:hover {
+            background: #334155;
+            color: #60a5fa;
+        }
+        .voice-button.recording {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .history-item {
+            background: #1e293b;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+        .history-item:hover {
+            border-color: #3b82f6;
+        }
+        .copy-button {
+            color: #64748b;
+            transition: all 0.2s ease;
+            padding: 0.5rem;
+            border-radius: 6px;
+        }
+        .copy-button:hover {
+            color: #3b82f6;
+            background: #334155;
+        }
+        .timestamp {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+        .prompt-text {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body class="flex h-screen">
+    <!-- Window Titlebar -->
+    <div class="window-titlebar">
+        <div class="flex items-center">
+            <i class="fas fa-robot mr-2 text-blue-400"></i>
+            <span class="font-medium">Email Assistant</span>
+        </div>
+        <div class="window-controls">
+            <div class="window-control-button minimize-button" id="minimizeBtn">
+                <i class="fas fa-minus"></i>
+            </div>
+            <div class="window-control-button close-button" id="closeBtn">
+                <i class="fas fa-times"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto p-8">
+        <div class="max-w-3xl mx-auto">
+            <!-- Email Generation Card -->
+            <div class="card mb-8">
+                <div class="flex items-start space-x-4">
+                    <div class="flex-1">
+                        <label class="block text-sm text-gray-400 mb-2">What kind of email would you like to generate?</label>
+                        <textarea id="emailPrompt" 
+                                  class="input-field"
+                                  rows="4"
+                                  placeholder="Example: Write a professional email to schedule a meeting with the marketing team to discuss Q2 strategy..."></textarea>
+                    </div>
+                    <div class="flex flex-col space-y-2">
+                        <button id="generateBtn" class="btn-primary">
+                            <i class="fas fa-magic mr-2"></i>
+                            Generate
+                        </button>
+                        <button id="voiceBtn" class="voice-button" title="Voice Input">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generated Email Card -->
+            <div class="card mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium">Generated Email</h3>
+                    <button id="copyBtn" class="copy-button" title="Copy to clipboard">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <div id="loadingSpinner" class="loading-spinner"></div>
+                <div id="errorMessage" class="error-message"></div>
+                <div id="emailResult" class="email-container"></div>
+            </div>
+
+            <!-- History Section -->
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium">Recent Emails</h3>
+                    <button id="clearHistoryBtn" class="text-sm text-gray-400 hover:text-gray-300">
+                        <i class="fas fa-trash-alt mr-1"></i>
+                        Clear History
+                    </button>
+                </div>
+                <div id="historyContainer" class="space-y-4">
+                    <!-- History items will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // Window control buttons
+        document.getElementById('minimizeBtn').addEventListener('click', () => {
+            ipcRenderer.send('minimize-window');
+        });
+
+        document.getElementById('closeBtn').addEventListener('click', () => {
+            ipcRenderer.send('close-window');
+        });
+
+        // Email generation handling
+        const generateBtn = document.getElementById('generateBtn');
+        const emailPrompt = document.getElementById('emailPrompt');
+        const emailResult = document.getElementById('emailResult');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const errorMessage = document.getElementById('errorMessage');
+        const voiceBtn = document.getElementById('voiceBtn');
+        const historyContainer = document.getElementById('historyContainer');
+        const copyBtn = document.getElementById('copyBtn');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+        let isRecording = false;
+
+        function showLoading() {
+            loadingSpinner.style.display = 'block';
+            errorMessage.style.display = 'none';
+            emailResult.textContent = '';
+            generateBtn.disabled = true;
+        }
+
+        function hideLoading() {
+            loadingSpinner.style.display = 'none';
+            generateBtn.disabled = false;
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            emailResult.textContent = '';
+        }
+
+        generateBtn.addEventListener('click', async () => {
+            const prompt = emailPrompt.value;
+            
+            if (!prompt) {
+                showError('Please enter an email prompt');
+                return;
+            }
+
+            showLoading();
+            
+            try {
+                const result = await ipcRenderer.invoke('generate-email', prompt);
+                if (result.status === 'success') {
+                    emailResult.textContent = result.email;
+                    errorMessage.style.display = 'none';
+                    loadHistory(); // Refresh history
+                } else {
+                    showError(result.message);
+                }
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Voice input handling
+        voiceBtn.addEventListener('click', () => {
+            if (!isRecording) {
+                // Start recording
+                isRecording = true;
+                voiceBtn.classList.add('recording');
+                voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                ipcRenderer.send('start-recording');
+            } else {
+                // Stop recording
+                isRecording = false;
+                voiceBtn.classList.remove('recording');
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                ipcRenderer.send('stop-recording');
+            }
+        });
+
+        // Handle voice input text
+        ipcRenderer.on('voice-text', (event, text) => {
+            emailPrompt.value = text;
+        });
+
+        // Copy to clipboard
+        copyBtn.addEventListener('click', () => {
+            const text = emailResult.textContent;
+            if (text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                    }, 2000);
+                });
+            }
+        });
+
+        // Clear history
+        clearHistoryBtn.addEventListener('click', async () => {
+            if (confirm('Are you sure you want to clear all history?')) {
+                await ipcRenderer.invoke('clear-history');
+                loadHistory();
+            }
+        });
+
+        // Load history
+        async function loadHistory() {
+            const history = await ipcRenderer.invoke('load-history');
+            historyContainer.innerHTML = '';
+
+            history.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <p class="timestamp">${new Date(item.timestamp).toLocaleString()}</p>
+                            <p class="prompt-text">${item.prompt}</p>
+                            <div class="mt-4 p-4 bg-[#0f172a] rounded-md">
+                                <p class="text-gray-300 whitespace-pre-wrap">${item.email}</p>
+                            </div>
+                        </div>
+                        <button class="copy-button" title="Copy to clipboard">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                `;
+
+                // Add copy functionality to history items
+                const copyButton = historyItem.querySelector('.copy-button');
+                copyButton.addEventListener('click', () => {
+                    const text = item.email;
+                    navigator.clipboard.writeText(text).then(() => {
+                        copyButton.innerHTML = '<i class="fas fa-check"></i>';
+                        setTimeout(() => {
+                            copyButton.innerHTML = '<i class="fas fa-copy"></i>';
+                        }, 2000);
+                    });
+                });
+
+                historyContainer.appendChild(historyItem);
+            });
+        }
+
+        // Initialize
+        loadHistory();
+    </script>
+</body>
+</html> 
