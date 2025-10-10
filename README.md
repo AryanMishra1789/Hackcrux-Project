@@ -284,7 +284,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 |------|------------|--------|----------|
 | **Lead Developer** | Sagar Kumar Sahu | [@yourhandle](https://github.com/yourhandle) | [Profile](https://linkedin.com/in/yourprofile) |
 | **AI Engineer** | Aritra Mahanty | [@member2](https://github.com/member2) | [Profile](https://linkedin.com/in/member2) |
-| **Automation Specialist** | Shreyas Desai | [@Lonewolf124](https://github.com/Lonewolf124) | [Profile](https://linkedin.com/in/member3) |
+| **Security Architect** | Shreyas Desai | [@Lonewolf124](https://github.com/Lonewolf124) | [Profile](https://linkedin.com/in/member3) |
 | **UI/UX Designer** | Aryan Mishra | [@member4](https://github.com/member4) | [Profile](https://linkedin.com/in/member4) |
 
 </div>
