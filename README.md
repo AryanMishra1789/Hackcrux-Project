@@ -307,9 +307,7 @@ We love new ideas! Open an issue with:
 - Implementation suggestions
 
 ### 📧 Contact
-- **Email**: support@syncflow.dev
-- **Discord**: [SyncFlow Community](https://discord.gg/syncflow)
-- **Twitter**: [@SyncFlowAI](https://twitter.com/syncflowai)
+- **Email**: lone124wolf@gmail.com
 
 ---
 
@@ -317,7 +315,7 @@ We love new ideas! Open an issue with:
 
 ### ⭐ If you find SyncFlow helpful, please give us a star!
 
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/syncflow.svg?style=social&label=Star&maxAge=2592000)](https://GitHub.com/yourusername/syncflow/stargazers/)
+[![GitHub stars](https://img.shields.io/github/stars/yourusername/syncflow.svg?style=social&label=Star&maxAge=2592000)](https://github.com/AryanMishra1789/Hackcrux-Project/)
 
 **Built with ❤️ for Privacy-Conscious Users**
 
