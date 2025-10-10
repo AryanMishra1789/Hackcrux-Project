@@ -280,8 +280,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### 🚀 Built by Team SyncFlow
 
-| Role | Contributor | GitHub | LinkedIn |
-|------|------------|--------|----------|
+| Role | Contributor |
+|------|------------|
 | **Lead Developer** | Sagar Kumar Sahu |
 | **AI Engineer** | Aritra Mahanty |
 | **Security Architect** | Shreyas Desai | 
