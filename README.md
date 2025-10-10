@@ -282,10 +282,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 | Role | Contributor | GitHub | LinkedIn |
 |------|------------|--------|----------|
-| **Lead Developer** | Your Name | [@yourhandle](https://github.com/yourhandle) | [Profile](https://linkedin.com/in/yourprofile) |
-| **AI Engineer** | Team Member 2 | [@member2](https://github.com/member2) | [Profile](https://linkedin.com/in/member2) |
-| **Automation Specialist** | Team Member 3 | [@member3](https://github.com/member3) | [Profile](https://linkedin.com/in/member3) |
-| **UI/UX Designer** | Team Member 4 | [@member4](https://github.com/member4) | [Profile](https://linkedin.com/in/member4) |
+| **Lead Developer** | Sagar Kumar Sahu | [@yourhandle](https://github.com/yourhandle) | [Profile](https://linkedin.com/in/yourprofile) |
+| **AI Engineer** | Aritra Mahanty | [@member2](https://github.com/member2) | [Profile](https://linkedin.com/in/member2) |
+| **Automation Specialist** | Shreyas Desai | [@member3](https://github.com/member3) | [Profile](https://linkedin.com/in/member3) |
+| **UI/UX Designer** | Aryan Mishra | [@member4](https://github.com/member4) | [Profile](https://linkedin.com/in/member4) |
 
 </div>
 
